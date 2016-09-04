@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(colored_text)
+project(3ds-mess)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -7,9 +7,9 @@ set(SOURCE_FILES
         source/main.cpp
         Makefile
         source/string_utils.cpp
-        source/string_utils.h source/vector_utils.cpp source/vector_utils.h source/console_debug.cpp source/console_debug.h)
+        source/string_utils.h source/vector_utils.cpp source/vector_utils.h source/console_debug.cpp source/console_debug.h source/mandel.cpp source/mandel.h source/histogram_acc.cpp source/histogram_acc.h)
 
-add_executable(colored_text ${SOURCE_FILES})
+add_executable(3ds-mess ${SOURCE_FILES})
 
 
 set(CMAKE_SYSTEM_NAME Generic)

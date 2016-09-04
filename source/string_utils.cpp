@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <cstdio>
+#include <algorithm>
 #include "string_utils.h"
 #include "vector_utils.h"
 #include "console_debug.h"
@@ -10,10 +11,8 @@
 using namespace std;
 const string SPACE = " ";
 
-namespace patch
-{
-    template < typename T > std::string to_string( const T& n )
-    {
+namespace patch {
+    template < typename T > std::string to_string( const T& n ) {
         std::ostringstream stm ;
         stm << n ;
         return stm.str() ;
@@ -30,15 +29,12 @@ string string_join(vector<string> input, string delim){
     }
     return ss.str();
 }
-
 string repeat(string s, size_t times) {
     std::stringstream ss;
     for(size_t i = 0; i < times; i++)
         ss << s;
     return ss.str();
 }
-
-
 string trim_beginning(string input){
     for(size_t i = 0; i< input.length(); i++){
         if(!isspace(input.at(i))){
@@ -55,13 +51,9 @@ string trim_tail(string input){
     }
     return "";
 }
-
 string trim(string input){
     return trim_beginning(trim_tail(input));
 }
-
-
-
 vector<string> split(const string &str, string delimiter) {
     string trimmed = trim(str);
     vector<string> elems;
@@ -75,7 +67,6 @@ vector<string> split(const string &str, string delimiter) {
     elems.push_back(trimmed.substr(last));
     return elems;
 }
-
 size_t get_length(vector<string> vector1, string delimiter, bool trailing_delimiter){
     if(vector1.size() == 0) {
         //printf("vector %x EMPTY\n ", &vector1);
@@ -99,8 +90,6 @@ vector<vector<string>> split_text(string input, size_t maxwidth){
     //error("in split_text...");
     vector<string> words = split(input, SPACE);
     //error(string("words split, #words: ") + patch::to_string(words.size()));
-
-
     vector<vector<string>> text;
     vector<string> last;
     for(string word : words) {
@@ -123,12 +112,9 @@ vector<vector<string>> split_text(string input, size_t maxwidth){
     if(last.size()){
         text.push_back(last);
     }
-
-
     return text;
 }
-
-string fmt_text(string input, size_t width, int justify){
+string fmt_paragraph(string input, size_t width, int justify){
     error("calling split_text...");
     vector<vector<string>> text = split_text(input, width);
     error(string("split text called, ") + patch::to_string(text.size()) + string(" lines") );
@@ -138,7 +124,7 @@ string fmt_text(string input, size_t width, int justify){
         //error(string("parsing line ") + string_join(line, " "));
         int j = justify;
         if(line == text.back()){
-            j = TEXT_JUSIFY_LEFT;
+            j = TEXT_JUSTIFY_LEFT;
         }
         string s = fmt(line, width, j, true);
         if(s.length() != width){
@@ -147,9 +133,15 @@ string fmt_text(string input, size_t width, int justify){
         lines.push_back(s);
     }
     return string_join(lines, "");
-    //return "okay okay okay okay okay okay okay okay okay okay okay okay ";
 }
+string fmt_text(string input, const size_t width, const int justify){
+    vector<string> paragraphs = split(input, "\n");
+    for (size_t i = 0; i<paragraphs.size(); i++){
+        paragraphs[i] = fmt_paragraph(trim(paragraphs[i]), width, justify);
+    }
 
+    return string_join(paragraphs, "\n");
+}
 string fmt(vector<string> words, size_t width, int justify, bool tolerate_long_strings){
     if(get_length(words, SPACE, false) > width){
         if(tolerate_long_strings){
@@ -162,7 +154,7 @@ string fmt(vector<string> words, size_t width, int justify, bool tolerate_long_s
     }
 
     switch (justify){
-        case TEXT_JUSIFY_LEFT:{
+        case TEXT_JUSTIFY_LEFT:{
 
             string r= string_join(words, SPACE);
             size_t add_spaces = width-r.length();
@@ -170,13 +162,13 @@ string fmt(vector<string> words, size_t width, int justify, bool tolerate_long_s
             return r+spaces;
         }
 
-        case TEXT_JUSIFY_RIGHT:{
+        case TEXT_JUSTIFY_RIGHT:{
             string r= string_join(words, SPACE);
             size_t add_spaces = width-r.length();
             string spaces= repeat(SPACE, add_spaces);
             return spaces+r;
         }
-        case TEXT_JUSIFY_CENTER:{
+        case TEXT_JUSTIFY_CENTER:{
             string r= string_join(words, SPACE);
             size_t add_spaces = width-r.length();
             size_t add_spaces_left = add_spaces/2;
@@ -185,16 +177,13 @@ string fmt(vector<string> words, size_t width, int justify, bool tolerate_long_s
             string spaces_right = repeat(SPACE, add_spaces_right);
             return spaces_left + string_join(words, SPACE) + spaces_right;
         }
-        case TEXT_JUSIFY_BOTH:{
-
-
+        case TEXT_JUSTIFY_BOTH:{
             string result = "";
-
             words = strip_empty_strings(words);
             size_t spaces_count = words.size() -1;
             if (spaces_count == 0){
                 // we have only one string;
-                return fmt(words, width, TEXT_JUSIFY_LEFT, tolerate_long_strings);
+                return fmt(words, width, TEXT_JUSTIFY_LEFT, tolerate_long_strings);
             } else {
                 size_t total_no_space_chars = 0;
 

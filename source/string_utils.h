@@ -11,10 +11,10 @@
 #include <sstream>
 #include <vector>
 
-const int TEXT_JUSIFY_LEFT = 0;
-const int TEXT_JUSIFY_RIGHT = 1;
-const int TEXT_JUSIFY_CENTER = 2;
-const int TEXT_JUSIFY_BOTH = 3;
+const int TEXT_JUSTIFY_LEFT = 0;
+const int TEXT_JUSTIFY_RIGHT = 1;
+const int TEXT_JUSTIFY_CENTER = 2;
+const int TEXT_JUSTIFY_BOTH = 3;
 using  namespace std;
 string fmt(vector<string>, size_t, int, bool );
 string trim(string input);
