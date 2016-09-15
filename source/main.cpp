@@ -114,8 +114,8 @@ void run_print_stats(fieldDef def, size_t q, vector<bgr_pixel> pallet, bool useH
     consoleSelect(&bottom);
     printf(colorize(COLOR_MAGENTA, "Running mandelGFX\n").c_str());
     printf("\n");
-    printf("%s: (% .2e, % .2e)\n", colorize(COLOR_WHITE, COLOR_BLUE, "IM").c_str(), def.IM_from, def.IM_to);
-    printf("%s: (% .2e, % .2e)\n", colorize(COLOR_WHITE, COLOR_RED, "RE").c_str(), def.RE_from, def.RE_to);
+    printf("%s: (% .4e, % .4e)\n", colorize(COLOR_WHITE, COLOR_BLUE, "IM").c_str(), def.IM_from, def.IM_to);
+    printf("%s: (% .4e, % .4e)\n", colorize(COLOR_WHITE, COLOR_RED, "RE").c_str(), def.RE_from, def.RE_to);
     printf("Display %dx%d\n", def.nRE, def.nIM);
     printf("Pallet size %d\n", pallet.size());
     printf("[A] Histogram color correction: [%s]\n", useHistogram?
