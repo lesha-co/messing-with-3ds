@@ -18,10 +18,10 @@ void run_mandel_gfx(fieldDef field){
     // getting pointer to lower screen frame buffer
     u8* fb = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
     double tolerance = 2.0;
-    mandelGFX(*bitmap, field, 100, tolerance);
+    mandelGFX(*fb, field, 100, tolerance);
 
     // writing to frame buffer
-    memcpy(fb, bitmap, TOP_MEMSIZE);
+    //memcpy(fb, bitmap, TOP_MEMSIZE);
 
 }
 

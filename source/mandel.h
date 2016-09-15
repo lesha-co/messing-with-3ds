@@ -32,5 +32,5 @@ vector<string> preparePallet(bool);
 size_t quantify(size_t input, size_t min, size_t max, size_t pallet_size);
 map<size_t ,size_t> buildPalletMappings(histogram_acc h, size_t pallet_size);
 histogram_acc histogram(vector<vector<size_t>> input);
-void mandelGFX(bgr_pixel &bitmap, fieldDef field, size_t max_iter, double radius);
+void mandelGFX(u8 &fb, fieldDef field, size_t max_iter, double radius);
 #endif //INC_3DS_MESS_MANDEL_H
