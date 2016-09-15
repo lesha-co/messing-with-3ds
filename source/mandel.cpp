@@ -1,6 +1,8 @@
 //
 // Created by lichevsky on 04.09.16.
 //
+#include <3ds/types.h>
+#include <cstring>
 #include "mandel.h"
 
 using namespace std;
@@ -127,4 +129,34 @@ vector<vector<size_t>> getField(fieldDef field, size_t max_iter, double radius){
         }
     }
     return iters;
+}
+
+void mandelGFX(bgr_pixel &bitmap, fieldDef field, size_t max_iter, double radius){
+    printf("Field Definition:\n\tnIM:%d, nRE:%d", field.nIM,field.nRE);
+    vector<double> REs = arrange(field.nRE, field.RE_from, field.RE_to);
+    vector<double> IMs = arrange(field.nIM, field.IM_from, field.IM_to);
+    /*
+     *  order is
+     *  3 6 9
+     *  2 5 8
+     *  1 4 7
+     * */
+    bgr_pixel* b = &bitmap;
+    size_t idx = 0;
+    printf("Running mandelGFX for %d pixels", field.nRE*field.nIM);
+    for (size_t j = 0; j < field.nRE; ++j) {
+        for (size_t i = 0; i < field.nIM; ++i) {
+            complex<double> c (REs[j], IMs[i]);
+
+            size_t lvl =iter(c, max_iter, radius);
+
+            u8 px = (u8)(((double)lvl / (double)max_iter)*256);
+
+            b[idx].b = px;
+            b[idx].g = px;
+            b[idx].r = px;
+
+            idx++;
+        }
+    }
 }
