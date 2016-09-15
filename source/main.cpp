@@ -3,7 +3,6 @@
 #include <cstdio>
 #include "mandel.h"
 #include <unistd.h>
-#include <cstring>
 #include "metrics.h"
 using namespace std;
 
@@ -169,10 +168,6 @@ int main(int argc, char **argv)
 
             run_mandel_gfx(field, CURRENT_Q);
         }
-
-
-
-
         ///
         /// run loop end
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

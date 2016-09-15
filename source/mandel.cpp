@@ -129,21 +129,6 @@ map<size_t ,size_t> buildPalletMappings(histogram_acc h, size_t pallet_size){
 
 }
 
-size_t quantify(size_t input, size_t min, size_t max, size_t pallet_size){
-    // returns from 0 to pallet_size-1 inclusive
-    size_t range = max-min;
-    double quant_range = double(range)/pallet_size;
-    if (input <= min) return 0;
-    if (input >= max) return pallet_size-1;
-    size_t current = (size_t )(double(input)/quant_range);
-
-    if(current >= pallet_size){
-        printf("\nerror, %d->%d, in(%d:%d), pallet: %d\n", input, current, min, max, pallet_size);
-
-    }
-    return current;
-}
-
 vector<vector<size_t>> getField(fieldDef field, size_t max_iter, double radius){
     vector<vector<size_t>> iters (field.nIM, vector<size_t>(field.nRE, 0));
     vector<double> REs = arrange(field.nRE, field.RE_from, field.RE_to);
@@ -160,34 +145,4 @@ vector<vector<size_t>> getField(fieldDef field, size_t max_iter, double radius){
         }
     }
     return iters;
-}
-
-void mandelGFX(u8 &fb, fieldDef field, size_t max_iter, double radius){
-    printf("Field Definition:\n\tnIM:%d, nRE:%d", field.nIM,field.nRE);
-    vector<double> REs = arrange(field.nRE, field.RE_from, field.RE_to);
-    vector<double> IMs = arrange(field.nIM, field.IM_from, field.IM_to);
-    /*
-     *  order is
-     *  3 6 9
-     *  2 5 8
-     *  1 4 7
-     * */
-    u8* frame_buf = &fb;
-    size_t idx = 0;
-    printf("Running mandelGFX for %d pixels", field.nRE*field.nIM);
-    for (size_t j = 0; j < field.nRE; ++j) {
-        for (size_t i = 0; i < field.nIM; ++i) {
-            complex<double> c (REs[j], IMs[i]);
-
-            size_t lvl =iter(c, max_iter, radius);
-
-            u8 px = (u8)(((double)lvl / (double)max_iter)*256);
-
-            frame_buf[idx*3] = px;
-            frame_buf[idx*3+1] = px;
-            frame_buf[idx*3+2] = px;
-
-            idx++;
-        }
-    }
 }
