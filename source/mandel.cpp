@@ -4,6 +4,7 @@
 #include <3ds/types.h>
 #include <cstring>
 #include "mandel.h"
+#include "string_utils.h"
 
 using namespace std;
 
@@ -51,12 +52,17 @@ vector<bgr_pixel> prepareGFXPallet(size_t grades){
         bgr_pixel current = key_points[i];
         bgr_pixel next = key_points[i+1];
         // b
-        s8 diff_b = next.b - current.b;
-        u8 step_b  =  (u8)((double)diff_b/(double)grades);
-        s8 diff_g = next.g - current.g;
-        u8 step_g  =  (u8)((double)diff_g/(double)grades);
-        s8 diff_r = next.r - current.r;
-        u8 step_r  =  (u8)((double)diff_r/(double)grades);
+
+        int diff_b = next.b - current.b;
+        s8 step_b  =  (s8)((double)diff_b/(double)grades);
+        int diff_g = next.g - current.g;
+        s8 step_g  =  (s8)((double)diff_g/(double)grades);
+        int diff_r = next.r - current.r;
+        s8 step_r  =  (s8)((double)diff_r/(double)grades);
+        printf("Step %d: dB:% .3d, sB: % .3d\n", i, diff_b, step_b);
+        printf("     %d: dG:% .3d, sG: % .3d\n", i, diff_g, step_g);
+        printf("     %d: dR:% .3d, sR: % .3d\n", i, diff_r, step_r);
+        printf("\n");
         for (s8 j = 0; j < grades; ++j) {
             p.push_back({current.b + step_b*j,
                          current.g + step_g*j,
@@ -70,14 +76,14 @@ vector<string> preparePallet(bool useColors){
     vector<string> pallet;
     if(useColors){
         vector<size_t> colors=  {
-                0, // black
-                1, // red
-                3, // yellow
-                2, // green
-                6, // cyan
-                4, // blue
-                5, // magenta
-                7 // white
+                COLOR_BLACK, // black
+                COLOR_RED, // red
+                COLOR_YELLOW, // yellow
+                COLOR_GREEN, // green
+                COLOR_CYAN, // cyan
+                COLOR_BLUE, // blue
+                COLOR_MAGENTA, // magenta
+                COLOR_WHITE // white
         };
         vector<string> grades = {
                 " ", "\xB0","\xB1","\xB2"
