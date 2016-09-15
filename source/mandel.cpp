@@ -47,17 +47,17 @@ vector<bgr_pixel> prepareGFXPallet(size_t grades){
             {0xFF ,0x00, 0xFF},
             {0xFF ,0xFF, 0xFF},
     };
-    for (int i = 0; i < key_points.size()-1; ++i) {
+    for (size_t i = 0; i < key_points.size()-1; ++i) {
         bgr_pixel current = key_points[i];
         bgr_pixel next = key_points[i+1];
         // b
-        int diff_b = next.b - current.b;
+        s8 diff_b = next.b - current.b;
         u8 step_b  =  (u8)((double)diff_b/(double)grades);
-        int diff_g = next.g - current.g;
+        s8 diff_g = next.g - current.g;
         u8 step_g  =  (u8)((double)diff_g/(double)grades);
-        int diff_r = next.r - current.r;
+        s8 diff_r = next.r - current.r;
         u8 step_r  =  (u8)((double)diff_r/(double)grades);
-        for (u8 j = 0; j < grades; ++j) {
+        for (s8 j = 0; j < grades; ++j) {
             p.push_back({current.b + step_b*j,
                          current.g + step_g*j,
                          current.r + step_r*j});

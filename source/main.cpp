@@ -9,11 +9,10 @@ using namespace std;
 
 PrintConsole bottom, top;
 
-void run_mandel_gfx(fieldDef field, size_t max_iter){
+void run_mandel_gfx(fieldDef field, size_t max_iter, vector<bgr_pixel> pallet){
 
     gfxSetDoubleBuffering(GFX_TOP, false);
     double tolerance = 2.0;
-    vector<bgr_pixel> pallet = prepareGFXPallet(8);
     // getting pointer to lower screen frame buffer
     u8* fb = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
     vector<vector<size_t>> iters = getField(field, max_iter, tolerance);
@@ -30,7 +29,7 @@ void run_mandel_gfx(fieldDef field, size_t max_iter){
                 printf("FAIL %d", quant);
 
             }
-            size_t offset = (i+j*iters.size())*3;
+            size_t offset = ((iters.size()-i-1)+j*iters.size())*3;
             bgr_pixel px = pallet[quant];
             fb[offset] = px.b;
             fb[offset+1] = px.g;
@@ -71,12 +70,24 @@ void run_mandel(fieldDef field){
 
 }
 
+void run_print_stats(fieldDef def, size_t q, vector<bgr_pixel> pallet) {
+    consoleInit(GFX_BOTTOM, &bottom);
+    consoleSelect(&bottom);
+    printf("Running mandelGFX\n");
+    printf("Im: (% .2e, % .2e)\n", def.IM_from, def.IM_to);
+    printf("Re: (% .2e, % .2e)\n", def.RE_from, def.RE_to);
+    printf("Display %dx%d\n", def.nRE, def.nIM);
+    printf("Pallet size %d\n", pallet.size());
+    printf("With %d iterations\n", q);
+
+}
+
 int main(int argc, char **argv)
 {
     gfxInitDefault();
     consoleInit(GFX_BOTTOM, &bottom);
     consoleSelect(&bottom);
-
+    vector<bgr_pixel> pallet= prepareGFXPallet(16);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// run once begin
     ///
@@ -99,7 +110,9 @@ int main(int argc, char **argv)
     size_t Q_BEST_MAX_ITER = 500;
     size_t CURRENT_Q = Q_DRAFT_MAX_ITER;
 
-    run_mandel_gfx(field, CURRENT_Q);
+    run_print_stats(field, CURRENT_Q, pallet);
+    run_mandel_gfx(field, CURRENT_Q, pallet);
+    printf("Ready.\n");
     ///
     /// run once end
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +179,9 @@ int main(int argc, char **argv)
                 CURRENT_Q = (CURRENT_Q == Q_DRAFT_MAX_ITER? Q_BEST_MAX_ITER:Q_DRAFT_MAX_ITER);
             }
 
-            run_mandel_gfx(field, CURRENT_Q);
+            run_print_stats(field, CURRENT_Q, pallet);
+            run_mandel_gfx(field, CURRENT_Q, pallet);
+            printf("Ready.\n");
         }
         ///
         /// run loop end
