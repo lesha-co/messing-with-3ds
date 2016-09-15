@@ -217,3 +217,12 @@ string fmt(vector<string> words, size_t width, int justify, bool tolerate_long_s
     }
     return string_join(words, SPACE);
 }
+
+string colorize(int foreground, int background, string text){
+    std::ostringstream stringStream;
+    stringStream << "\x1b[4" << background << ";3" << foreground << "m" << text << "\x1b[0m";
+    return stringStream.str();
+}
+string colorize(int foreground, string text){
+    return colorize(foreground, COLOR_BLACK, text);
+}
