@@ -10,19 +10,35 @@ using namespace std;
 
 PrintConsole bottom, top;
 
-void run_mandel_gfx(fieldDef field){
+void run_mandel_gfx(fieldDef field, size_t max_iter){
 
     gfxSetDoubleBuffering(GFX_TOP, false);
-    // allocating memory for our drawings
-    bgr_pixel* bitmap = (bgr_pixel*)malloc(TOP_MEMSIZE);
+    double tolerance = 2.0;
+    vector<bgr_pixel> pallet = prepareGFXPallet(8);
     // getting pointer to lower screen frame buffer
     u8* fb = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
-    double tolerance = 2.0;
-    mandelGFX(*fb, field, 100, tolerance);
+    vector<vector<size_t>> iters = getField(field, max_iter, tolerance);
+    histogram_acc h = histogram(iters);
+    map<size_t, size_t> mapping = buildPalletMappings(h, pallet.size());
 
-    // writing to frame buffer
-    //memcpy(fb, bitmap, TOP_MEMSIZE);
+    for (size_t i = 0; i < iters.size(); ++i) {
+        vector<size_t> line = iters[i];
 
+        for (size_t j = 0; j < line.size(); ++j) {
+            size_t cell = line.at(j);
+            size_t quant = mapping[cell];
+            if(quant >= pallet.size()){
+                printf("FAIL %d", quant);
+
+            }
+            size_t offset = (i+j*iters.size())*3;
+            bgr_pixel px = pallet[quant];
+            fb[offset] = px.b;
+            fb[offset+1] = px.g;
+            fb[offset+2] = px.r;
+        }
+
+    }
 }
 
 void run_mandel(fieldDef field){
@@ -80,9 +96,11 @@ int main(int argc, char **argv)
     double move_factor = 0.5; // of viewport, not absolute
     double zoom_factor = 2; // of viewport, not absolute.
 
+    size_t Q_DRAFT_MAX_ITER = 50;
+    size_t Q_BEST_MAX_ITER = 500;
+    size_t CURRENT_Q = Q_DRAFT_MAX_ITER;
 
-    run_mandel_gfx(field);
-
+    run_mandel_gfx(field, CURRENT_Q);
     ///
     /// run once end
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,8 +163,11 @@ int main(int argc, char **argv)
             if (kDown & KEY_X) {
                 field = def;
             }
+            if (kDown & KEY_Y) {
+                CURRENT_Q = (CURRENT_Q == Q_DRAFT_MAX_ITER? Q_BEST_MAX_ITER:Q_DRAFT_MAX_ITER);
+            }
 
-            run_mandel_gfx(field);
+            run_mandel_gfx(field, CURRENT_Q);
         }
 
 
