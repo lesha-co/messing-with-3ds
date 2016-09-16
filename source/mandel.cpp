@@ -8,12 +8,6 @@
 
 using namespace std;
 
-template<class T>
-T length(complex<T> c){
-    return sqrt( c.imag()*c.imag()+c.real()*c.real());
-}
-
-
 size_t iter(complex<double> c, size_t limit, double radius){
     complex<double> z  (0,0);
     size_t i = 0;

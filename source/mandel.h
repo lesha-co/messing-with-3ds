@@ -41,4 +41,8 @@ vector<string> preparePallet(bool);
 map<size_t ,size_t> buildPalletMappings(histogram_acc h, size_t pallet_size);
 histogram_acc histogram(vector<vector<size_t>> input);
 vector<bgr_pixel> prepareGFXPallet(size_t grades);
+template<typename T>
+T length(complex<T> c){
+    return sqrt( c.imag()*c.imag()+c.real()*c.real());
+}
 #endif //INC_3DS_MESS_MANDEL_H
