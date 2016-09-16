@@ -6,28 +6,38 @@
 #define INC_3DS_MESS_METRICS_H
 
 #include <cstdlib>
+#include <3ds/gfx.h>
 
 const size_t BPP = 3;
 
 
-// Top screen
-const size_t TOP_COLUMNS = 50;
-const size_t TOP_LINES = 30;
 
-const size_t TOP_WIDTH = 400;
-const size_t TOP_HEIGHT = 240;
+class ScreenDefinition{
+public:
+    ScreenDefinition(size_t WIDTH, size_t HEIGHT,
+                    size_t COLUMNS, size_t ROWS,
+                    gfxScreen_t HANDLE);
+    size_t getWIDTH() const;
+    size_t getHEIGHT() const;
+    size_t getCOLUMNS() const;
+    size_t getROWS() const;
+    size_t getPIXELS() const;
+    size_t getMEMSIZE() const;
+    gfxScreen_t getHANDLE() const;
+private:
+    size_t WIDTH;
+    size_t HEIGHT;
+    size_t COLUMNS;
+    size_t ROWS;
+    gfxScreen_t HANDLE;
+};
 
-const size_t TOP_PIXELS = TOP_WIDTH * TOP_HEIGHT;
-const size_t TOP_MEMSIZE = TOP_PIXELS*BPP;
+const ScreenDefinition TOP_SCREEN = ScreenDefinition(
+        400,240,50,30,GFX_TOP
+);
+const ScreenDefinition BOTTOM_SCREEN = ScreenDefinition(
+        320,240,40,30,GFX_BOTTOM
+);
 
-// Bottom screen
-const size_t BOTTOM_COLUMNS = 40;
-const size_t BOTTOM_LINES = 30;
-
-const size_t BOTTOM_WIDTH = 400;
-const size_t BOTTOM_HEIGHT = 240;
-
-const size_t BOTTOM_PIXELS = BOTTOM_WIDTH * BOTTOM_HEIGHT;
-const size_t BOTTOM_MEMSIZE = TOP_PIXELS*BPP;
 
 #endif //INC_3DS_MESS_METRICS_H

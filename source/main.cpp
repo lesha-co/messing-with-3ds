@@ -9,7 +9,7 @@
 using namespace std;
 
 
-PrintConsole bottom, top;
+PrintConsole printConsole;
 size_t quantify(size_t input, size_t min, size_t max, size_t pallet_size){
     // returns from 0 to pallet_size-1 inclusive
     size_t range = max-min;
@@ -25,12 +25,13 @@ size_t quantify(size_t input, size_t min, size_t max, size_t pallet_size){
     return current;
 }
 
-void run_pallet(vector<bgr_pixel> pallet){
-    gfxSetDoubleBuffering(GFX_TOP, false);
-    u8* fb = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
-    for (size_t i = 0; i < TOP_PIXELS; ++i) {
-        size_t quant = quantify(i, 0, TOP_PIXELS, pallet.size());
-        bgr_pixel px = pallet[quant];
+void run_pallet(RenderOptions options){
+    ScreenDefinition d = options.geometry;
+    gfxSetDoubleBuffering(d.getHANDLE(), false);
+    u8* fb = gfxGetFramebuffer(options.geometry.getHANDLE(), GFX_LEFT, NULL, NULL);
+    for (size_t i = 0; i < d.getPIXELS(); ++i) {
+        size_t quant = quantify(i, 0, d.getPIXELS(), options.pallet.size());
+        bgr_pixel px = options.pallet[quant];
 
         fb[i*3] = px.b;
         fb[i*3+1] = px.g;
@@ -40,10 +41,10 @@ void run_pallet(vector<bgr_pixel> pallet){
 
 void run_mandel_gfx(FieldDef field, RenderOptions options){
 
-    gfxSetDoubleBuffering(GFX_TOP, false);
+    gfxSetDoubleBuffering(options.geometry.getHANDLE(), false);
 
     // getting pointer to lower screen frame buffer
-    u8* fb = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
+    u8* fb = gfxGetFramebuffer(options.geometry.getHANDLE(), GFX_LEFT, NULL, NULL);
     vector<vector<size_t>> iters = getField(field, options);
 
     histogram_acc h;
@@ -79,7 +80,7 @@ void run_mandel_gfx(FieldDef field, RenderOptions options){
 }
 
 void run_mandel(FieldDef field, RenderOptions options){
-    consoleInit(GFX_TOP, NULL);
+    consoleInit(options.geometry.getHANDLE(), NULL);
     vector<string> pallet = preparePallet(true);
 
     vector<vector<size_t>> iters = getField(field, options );
@@ -107,8 +108,8 @@ void run_mandel(FieldDef field, RenderOptions options){
 }
 
 void run_print_stats(FieldDef def, RenderOptions options) {
-    consoleInit(GFX_BOTTOM, &bottom);
-    consoleSelect(&bottom);
+    consoleInit(options.console.getHANDLE(), &printConsole);
+    consoleSelect(&printConsole);
     printf(colorize(COLOR_MAGENTA, "Running mandelGFX\n").c_str());
     printf("\n");
     printf("%s: (% .4e, % .4e)\n", colorize(COLOR_WHITE, COLOR_BLUE, "IM").c_str(), def.IM_from, def.IM_to);
@@ -134,23 +135,25 @@ void fix_aspect(FieldDef* def, double new_aspect){
 int main(int argc, char **argv)
 {
     gfxInitDefault();
-    consoleInit(GFX_BOTTOM, &bottom);
-    consoleSelect(&bottom);
+    ScreenDefinition display = TOP_SCREEN;
+    ScreenDefinition console = BOTTOM_SCREEN;
+    consoleInit(console.getHANDLE(), &printConsole);
+    consoleSelect(&printConsole);
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// run once begin
     ///
     double default_width = 3;
     double default_height = 3;
-
     FieldDef def =  {
-            TOP_WIDTH,
-            TOP_HEIGHT,
+            display.getWIDTH(),
+            display.getHEIGHT(),
             -2.25,
             -2.25+default_width,
             -1.5,
             -1.5+default_height
     };
-    double aspect = (double)TOP_WIDTH/(double)TOP_HEIGHT;
+    double aspect = (double)display.getWIDTH()/(double)display.getHEIGHT();
     fix_aspect(&def, aspect);
     FieldDef field =def;
     double move_factor = 0.25; // of viewport, not absolute
@@ -163,9 +166,11 @@ int main(int argc, char **argv)
             Q_DRAFT_MAX_ITER,
             true,
             prepareGFXPallet(16),
-            2.0f
+            2.0f,
+            display,
+            console
     };
-    run_pallet(options.pallet);
+    run_pallet(options);
     printf(colorize(COLOR_RED, "Now starting...\n").c_str());
     usleep(1000000);
     run_print_stats(field, options);

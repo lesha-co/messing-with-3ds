@@ -10,6 +10,7 @@
 #include <vector>
 #include <cstdio>
 #include "histogram_acc.h"
+#include "metrics.h"
 
 using namespace std;
 
@@ -23,6 +24,8 @@ struct RenderOptions{
     bool useHistogram;
     vector<bgr_pixel> pallet;
     double radius;
+    ScreenDefinition geometry;
+    ScreenDefinition console;
 };
 struct FieldDef{
     size_t nRE;

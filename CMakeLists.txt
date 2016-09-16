@@ -7,7 +7,7 @@ set(SOURCE_FILES
         source/main.cpp
         Makefile
         source/string_utils.cpp
-        source/string_utils.h source/vector_utils.cpp source/vector_utils.h source/console_debug.cpp source/console_debug.h source/mandel.cpp source/mandel.h source/histogram_acc.cpp source/histogram_acc.h source/metrics.h source/demos/string_justifying.cpp)
+        source/string_utils.h source/vector_utils.cpp source/vector_utils.h source/console_debug.cpp source/console_debug.h source/mandel.cpp source/mandel.h source/histogram_acc.cpp source/histogram_acc.h source/metrics.h source/demos/string_justifying.cpp source/metrics.cpp)
 
 add_executable(3ds-mess ${SOURCE_FILES})
 
