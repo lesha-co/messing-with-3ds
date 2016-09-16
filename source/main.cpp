@@ -125,6 +125,15 @@ void run_print_stats(fieldDef def, size_t q, vector<bgr_pixel> pallet, bool useH
 
 }
 
+void fix_aspect(fieldDef* def, double new_aspect){
+    double def_h = def->IM_to - def->IM_from;
+    double def_w = def->RE_to - def->RE_from;
+    double new_w = def_h* new_aspect;
+    double d_w = (new_w-def_w)/2.0;
+    def->RE_from-=d_w;
+    def->RE_to+=d_w;
+}
+
 int main(int argc, char **argv)
 {
     gfxInitDefault();
@@ -145,6 +154,8 @@ int main(int argc, char **argv)
             -1.5,
             -1.5+default_height
     };
+    double aspect = (double)TOP_WIDTH/(double)TOP_HEIGHT;
+    fix_aspect(&def, aspect);
     fieldDef field =def;
     double move_factor = 0.5; // of viewport, not absolute
     double zoom_factor = 2; // of viewport, not absolute.
