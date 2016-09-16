@@ -135,7 +135,7 @@ map<size_t ,size_t> buildPalletMappings(histogram_acc h, size_t pallet_size){
 
 }
 
-vector<vector<size_t>> getField(fieldDef field, size_t max_iter, double radius){
+vector<vector<size_t>> getField(FieldDef field, RenderOptions options){
     vector<vector<size_t>> iters (field.nIM, vector<size_t>(field.nRE, 0));
     vector<double> REs = arrange(field.nRE, field.RE_from, field.RE_to);
     vector<double> IMs = arrange(field.nIM, field.IM_from, field.IM_to);
@@ -144,8 +144,8 @@ vector<vector<size_t>> getField(fieldDef field, size_t max_iter, double radius){
         for (size_t j = 0; j < field.nRE; ++j) {
             complex<double> c (REs[j], IMs[i]);
 
-            iters[i][j] = iter(c, max_iter, radius);
-            if(iters[i][j] >  max_iter){
+            iters[i][j] = iter(c, options.max_iter, options.radius);
+            if(iters[i][j] >  options.max_iter){
                 printf("\nerror\n");
             }
         }

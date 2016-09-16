@@ -38,20 +38,20 @@ void run_pallet(vector<bgr_pixel> pallet){
     }
 }
 
-void run_mandel_gfx(fieldDef field, size_t max_iter, vector<bgr_pixel> pallet, bool useHistogram){
+void run_mandel_gfx(FieldDef field, RenderOptions options){
 
     gfxSetDoubleBuffering(GFX_TOP, false);
-    double tolerance = 2.0;
+
     // getting pointer to lower screen frame buffer
     u8* fb = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
-    vector<vector<size_t>> iters = getField(field, max_iter, tolerance);
+    vector<vector<size_t>> iters = getField(field, options);
 
     histogram_acc h;
     map<size_t, size_t> mapping;
     size_t quant;
-    if(useHistogram){
+    if(options.useHistogram){
         h = histogram(iters);
-        mapping = buildPalletMappings(h, pallet.size());
+        mapping = buildPalletMappings(h, options.pallet.size());
     }
     for (size_t i = 0; i < iters.size(); ++i) {
         vector<size_t> line = iters[i];
@@ -59,17 +59,17 @@ void run_mandel_gfx(fieldDef field, size_t max_iter, vector<bgr_pixel> pallet, b
         for (size_t j = 0; j < line.size(); ++j) {
             size_t cell = line.at(j);
 
-            if(useHistogram){
+            if(options.useHistogram){
                 quant = mapping[cell];
             } else {
-                quant = quantify(cell, 0, max_iter, pallet.size());
+                quant = quantify(cell, 0, options.max_iter, options.pallet.size());
             }
-            if(quant >= pallet.size()){
+            if(quant >= options.pallet.size()){
                 printf("FAIL %d", quant);
 
             }
             size_t offset = ((iters.size()-i-1)+j*iters.size())*3;
-            bgr_pixel px = pallet[quant];
+            bgr_pixel px = options.pallet[quant];
             fb[offset] = px.b;
             fb[offset+1] = px.g;
             fb[offset+2] = px.r;
@@ -78,12 +78,11 @@ void run_mandel_gfx(fieldDef field, size_t max_iter, vector<bgr_pixel> pallet, b
     }
 }
 
-void run_mandel(fieldDef field){
+void run_mandel(FieldDef field, RenderOptions options){
     consoleInit(GFX_TOP, NULL);
-    double tolerance = 2.0;
     vector<string> pallet = preparePallet(true);
 
-    vector<vector<size_t>> iters = getField(field, 1000, tolerance);
+    vector<vector<size_t>> iters = getField(field, options );
 
     histogram_acc h = histogram(iters);
     map<size_t, size_t> mapping = buildPalletMappings(h, pallet.size());
@@ -98,8 +97,6 @@ void run_mandel(fieldDef field){
                 printf("FAIL %d", quant);
 
             }
-            //size_t quant = quantify(cell, 0, 1000, pallet.size());
-            //usleep(1000000);
             printf(pallet[quant].c_str());
             gfxFlushBuffers();
 
@@ -109,7 +106,7 @@ void run_mandel(fieldDef field){
 
 }
 
-void run_print_stats(fieldDef def, size_t q, vector<bgr_pixel> pallet, bool useHistogram) {
+void run_print_stats(FieldDef def, RenderOptions options) {
     consoleInit(GFX_BOTTOM, &bottom);
     consoleSelect(&bottom);
     printf(colorize(COLOR_MAGENTA, "Running mandelGFX\n").c_str());
@@ -117,15 +114,15 @@ void run_print_stats(fieldDef def, size_t q, vector<bgr_pixel> pallet, bool useH
     printf("%s: (% .4e, % .4e)\n", colorize(COLOR_WHITE, COLOR_BLUE, "IM").c_str(), def.IM_from, def.IM_to);
     printf("%s: (% .4e, % .4e)\n", colorize(COLOR_WHITE, COLOR_RED, "RE").c_str(), def.RE_from, def.RE_to);
     printf("Display %dx%d\n", def.nRE, def.nIM);
-    printf("Pallet size %d\n", pallet.size());
-    printf("[A] Histogram color correction: [%s]\n", useHistogram?
+    printf("Pallet size %d\n", options.pallet.size());
+    printf("[A] Histogram color correction: [%s]\n", options.useHistogram?
                                   colorize(COLOR_WHITE,COLOR_GREEN,"YES").c_str():
                                   colorize(COLOR_WHITE,COLOR_RED,"NO").c_str());
-    printf("[Y] Max iterations: %d\n", q);
+    printf("[Y] Max iterations: %d\n", options.max_iter);
 
 }
 
-void fix_aspect(fieldDef* def, double new_aspect){
+void fix_aspect(FieldDef* def, double new_aspect){
     double def_h = def->IM_to - def->IM_from;
     double def_w = def->RE_to - def->RE_from;
     double new_w = def_h* new_aspect;
@@ -139,14 +136,13 @@ int main(int argc, char **argv)
     gfxInitDefault();
     consoleInit(GFX_BOTTOM, &bottom);
     consoleSelect(&bottom);
-    vector<bgr_pixel> pallet= prepareGFXPallet(16);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// run once begin
     ///
     double default_width = 3;
     double default_height = 3;
 
-    fieldDef def =  {
+    FieldDef def =  {
             TOP_WIDTH,
             TOP_HEIGHT,
             -2.25,
@@ -156,19 +152,24 @@ int main(int argc, char **argv)
     };
     double aspect = (double)TOP_WIDTH/(double)TOP_HEIGHT;
     fix_aspect(&def, aspect);
-    fieldDef field =def;
-    double move_factor = 0.5; // of viewport, not absolute
-    double zoom_factor = 2; // of viewport, not absolute.
-
+    FieldDef field =def;
+    double move_factor = 0.25; // of viewport, not absolute
+    double zoom_factor = 1.5; // of viewport, not absolute.
     size_t Q_DRAFT_MAX_ITER = 50;
     size_t Q_BEST_MAX_ITER = 500;
-    size_t CURRENT_Q = Q_DRAFT_MAX_ITER;
     bool useHistogram = true;
-    run_pallet(pallet);
+
+    RenderOptions options ={
+            Q_DRAFT_MAX_ITER,
+            true,
+            prepareGFXPallet(16),
+            2.0f
+    };
+    run_pallet(options.pallet);
     printf(colorize(COLOR_RED, "Now starting...\n").c_str());
     usleep(1000000);
-    run_print_stats(field, CURRENT_Q, pallet, useHistogram);
-    run_mandel_gfx(field, CURRENT_Q, pallet, useHistogram);
+    run_print_stats(field, options);
+    run_mandel_gfx(field, options);
     ///
     /// run once end
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,14 +233,14 @@ int main(int argc, char **argv)
                 field = def;
             }
             if (kDown & KEY_Y) {
-                CURRENT_Q = (CURRENT_Q == Q_DRAFT_MAX_ITER? Q_BEST_MAX_ITER:Q_DRAFT_MAX_ITER);
+                options.max_iter = (options.max_iter == Q_DRAFT_MAX_ITER? Q_BEST_MAX_ITER:Q_DRAFT_MAX_ITER);
             }
             if (kDown & KEY_A) {
                 useHistogram = !useHistogram;
             }
 
-            run_print_stats(field, CURRENT_Q, pallet, useHistogram);
-            run_mandel_gfx(field, CURRENT_Q, pallet, useHistogram);
+            run_print_stats(field, options);
+            run_mandel_gfx(field, options);
             printf(colorize(COLOR_CYAN, "Ready").c_str());
         }
         ///

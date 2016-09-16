@@ -18,7 +18,13 @@ struct bgr_pixel{
     u8 g;
     u8 r;
 };
-struct fieldDef{
+struct RenderOptions{
+    size_t max_iter;
+    bool useHistogram;
+    vector<bgr_pixel> pallet;
+    double radius;
+};
+struct FieldDef{
     size_t nRE;
     size_t nIM;
     double RE_from;
@@ -27,7 +33,7 @@ struct fieldDef{
     double IM_to;
 };
 
-vector<vector<size_t>> getField(fieldDef, size_t, double);
+vector<vector<size_t>> getField(FieldDef, RenderOptions);
 vector<string> preparePallet(bool);
 map<size_t ,size_t> buildPalletMappings(histogram_acc h, size_t pallet_size);
 histogram_acc histogram(vector<vector<size_t>> input);
