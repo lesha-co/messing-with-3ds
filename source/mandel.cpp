@@ -63,10 +63,12 @@ vector<bgr_pixel> prepareGFXPallet(size_t grades){
         printf("     %d: dG:% .3d, sG: % .3d\n", i, diff_g, step_g);
         printf("     %d: dR:% .3d, sR: % .3d\n", i, diff_r, step_r);
         printf("\n");
-        for (s8 j = 0; j < grades; ++j) {
-            p.push_back({current.b + step_b*j,
-                         current.g + step_g*j,
-                         current.r + step_r*j});
+        for (u8 j = 0; j < grades; ++j) {
+            p.push_back(
+                    {(u8)(current.b + step_b*j),
+                     (u8)(current.g + step_g*j),
+                     (u8)(current.r + step_r*j)}
+            );
         }
     }
     return p;
